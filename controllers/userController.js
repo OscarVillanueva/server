@@ -31,6 +31,10 @@ exports.createUser = async (req, res) => {
         // Guardar usuario
         await user.save()
 
+        // TODO: Verificar si en es punto el usuario ya tiene un id
+        // TODO: Crear un proyecto dummy de introducción
+        // TODO: Crear tres tareas dummys de introducción
+
         // Crear y firmar el jwt
         const payload = {
             user: {
