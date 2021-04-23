@@ -1,4 +1,6 @@
 const User = require("../models/User")
+const Project = require("../models/Project")
+const Task = require("../models/Task")
 const bcryptjs = require("bcryptjs")
 const {validationResult } = require("express-validator")
 const jwt = require("jsonwebtoken")
@@ -13,6 +15,22 @@ exports.createUser = async (req, res) => {
 
     // Extraer email y password
     const {email, password} = req.body
+
+    // Tareas dummies
+    const dummiesTasks = [ 
+        {
+            taskName: "Terminar el tour",
+            state: false,
+        }, 
+        {
+            taskName: "Comparir Todapp",
+            state: false,
+        }, 
+        {   
+            taskName: "Suscribirme a Todapp",
+            state: true,
+        } 
+    ]
 
     try {
         // Revisar que el nuevo usuario sea unico
@@ -31,9 +49,23 @@ exports.createUser = async (req, res) => {
         // Guardar usuario
         await user.save()
 
-        // TODO: Verificar si en es punto el usuario ya tiene un id
-        // TODO: Crear un proyecto dummy de introducción
-        // TODO: Crear tres tareas dummys de introducción
+
+        // Crear un nuevo proyecto  
+        const project = new Project({ projectName: "Ejemplo" })
+
+        // Guardar el creador vía webtoken
+        project.owner = user.id
+
+        await project.save()
+
+        // Crear tres tareas dummys de introducción
+        for await ( dummie of dummiesTasks ) {
+
+            const task = new Task( dummie )
+            task.projectId = project.id
+            await task.save()
+
+        }
 
         // Crear y firmar el jwt
         const payload = {
